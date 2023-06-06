@@ -41,6 +41,11 @@ public class AttendanceKids extends BaseNoAuditingExcel<String> {
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_class", nullable = false)
+    private MaClass maClass;
+
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_kid", nullable = false)
     private Kids kids;
 

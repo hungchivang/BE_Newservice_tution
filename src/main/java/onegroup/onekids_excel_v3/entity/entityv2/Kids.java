@@ -1,5 +1,6 @@
 package onegroup.onekids_excel_v3.entity.entityv2;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
@@ -141,6 +142,11 @@ public class Kids extends BaseExcel<String> {
 
     //số định danh cá nhân
     private String identificationNumber;
+
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "id_class", nullable = false)
+    private MaClass maClass;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "kids", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
