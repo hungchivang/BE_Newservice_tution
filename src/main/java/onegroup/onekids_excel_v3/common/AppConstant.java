@@ -1,4 +1,4 @@
-package onegroup.onekids_excel_v3.entity.common;
+package onegroup.onekids_excel_v3.common;
 
 public interface AppConstant {
     boolean APP_TRUE = true;

@@ -2,7 +2,7 @@ package onegroup.onekids_excel_v3.entity.baseexcel;
 
 import lombok.Getter;
 import lombok.Setter;
-import onegroup.onekids_excel_v3.entity.common.AppConstant;
+import onegroup.onekids_excel_v3.common.AppConstant;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

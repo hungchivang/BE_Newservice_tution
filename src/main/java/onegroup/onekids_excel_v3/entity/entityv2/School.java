@@ -1,11 +1,10 @@
 package onegroup.onekids_excel_v3.entity.entityv2;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import onegroup.onekids_excel_v3.entity.baseexcel.BaseExcel;
-import onegroup.onekids_excel_v3.entity.common.AppConstant;
+import onegroup.onekids_excel_v3.common.AppConstant;
 
 import javax.persistence.*;
 import java.time.LocalDate;

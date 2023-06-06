@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import onegroup.onekids_excel_v3.entity.baseexcel.BaseExcel;
-import onegroup.onekids_excel_v3.entity.common.AppConstant;
+import onegroup.onekids_excel_v3.common.AppConstant;
 import onegroup.onekids_excel_v3.entity.excel.*;
 
 import javax.persistence.*;
