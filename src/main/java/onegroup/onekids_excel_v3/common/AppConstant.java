@@ -1,5 +1,7 @@
 package onegroup.onekids_excel_v3.common;
 
+import java.time.LocalTime;
+
 public interface AppConstant {
     boolean APP_TRUE = true;
     boolean APP_FALSE = false;
@@ -219,4 +221,9 @@ public interface AppConstant {
     String KID_SEARCH_START_DATE = "startDate";
     String KID_SEARCH_BIRTHDAY = "birthday";
 
+    String EXPORT_EXCEL_PROCESSING = "processing";
+    String EXPORT_EXCEL_COMPLETE = "complete";
+    String EXPORT_EXCEL_FAIL = "fail";
+
+    LocalTime TIME_LEAVE_KID_DEFAULT = LocalTime.of(17, 0, 0);
 }

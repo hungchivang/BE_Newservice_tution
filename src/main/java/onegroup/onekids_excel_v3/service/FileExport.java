@@ -3,7 +3,6 @@ package onegroup.onekids_excel_v3.service;
 import onegroup.onekids_excel_v3.entity.entityv2.Kids;
 import onegroup.onekids_excel_v3.entity.excel.StatusExcel;
 import onegroup.onekids_excel_v3.repository.statusExcel.StatusExcelRepo;
-import onegroup.onekids_excel_v3.service.statusExcel.StatusExcelImpl;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import static onegroup.onekids_excel_v3.common.AppConstant.EXPORT_EXCEL_COMPLETE;
+import static onegroup.onekids_excel_v3.common.AppConstant.EXPORT_EXCEL_FAIL;
 
 @Service
 public class FileExport {
@@ -520,7 +522,7 @@ public class FileExport {
     public void export(HttpServletResponse response, StatusExcel statusExcel) throws IOException {
 
         String fileName = statusExcel.getFileName();
-        String pathFile = "C:\\Users\\ADMIN\\Desktop\\OneKids\\Code-BackEnd\\Main\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\" + fileName ;
+        String pathFile = "C:\\Users\\hungchivang\\Desktop\\OneGroup\\API BackEnd\\MAIN\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\" + fileName ;
         writeHeaderLine(6,2023);
         writeDataLines();
         try{
@@ -531,12 +533,12 @@ public class FileExport {
             }catch (IOException ex){
                 ex.printStackTrace();
             }
-            statusExcel.setStatus("Complete");
+            statusExcel.setStatus(EXPORT_EXCEL_COMPLETE);
             statusExcelRepo.save(statusExcel);
             workbook.close();
             outputStream.close();
         }catch(IOException ex) {
-            statusExcel.setStatus("Fail");
+            statusExcel.setStatus(EXPORT_EXCEL_FAIL);
             statusExcelRepo.save(statusExcel);
             workbook.close();
             ex.printStackTrace();

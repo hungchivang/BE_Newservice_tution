@@ -33,6 +33,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static onegroup.onekids_excel_v3.common.AppConstant.EXPORT_EXCEL_PROCESSING;
+
 
 @Controller
 @CrossOrigin("*")
@@ -67,8 +69,8 @@ public class FilesController {
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         String currentDateTime = dateFormatter.format(new Date());
 
-        Path source = Paths.get("C:\\Users\\ADMIN\\Desktop\\OneKids\\Code-BackEnd\\Main\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\Template Example.xlsx");
-        Path newDir = Paths.get("C:\\Users\\ADMIN\\Desktop\\OneKids\\Code-BackEnd\\Main\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\");
+        Path source = Paths.get("C:\\Users\\hungchivang\\Desktop\\OneGroup\\API BackEnd\\MAIN\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\Template Example.xlsx");
+        Path newDir = Paths.get("C:\\Users\\hungchivang\\Desktop\\OneGroup\\API BackEnd\\MAIN\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\");
 
         Files.createDirectories(newDir);
         Files.move(source, newDir.resolve(source.getFileName()),
@@ -77,7 +79,7 @@ public class FilesController {
         List<Kids> kidsList = kidExcelService.findAllByIdSchool(idSchool);
         StatusExcel statusExcel1 = statusExcelImpl.findByGuiId("1A");
         if(statusExcel1 == null){
-            StatusExcel statusExcel2 = new StatusExcel("1A","processing","ListKids " + currentDateTime + ".xlsx", LocalDateTime.now());
+            StatusExcel statusExcel2 = new StatusExcel("1A",EXPORT_EXCEL_PROCESSING,"ListKids " + currentDateTime + ".xlsx", LocalDateTime.now());
             statusExcelImpl.save(statusExcel2);
 
             FileExport fileExport = new FileExport(kidsList);
