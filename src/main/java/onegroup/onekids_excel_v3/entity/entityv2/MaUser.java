@@ -103,9 +103,9 @@ public class MaUser extends BaseExcel<String> {
     @OneToMany(mappedBy = "maUser", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<HistoryOrderKids> historyOrderKidsList;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "maUser", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    private List<TotalKidsArrive> totalKidsArriveList;
+//    @JsonManagedReference
+//    @OneToMany(mappedBy = "maUser", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+//    private List<TotalKidsArrive> totalKidsArriveList;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "maUser", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)

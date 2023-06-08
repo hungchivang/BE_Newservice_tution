@@ -3,6 +3,7 @@ package onegroup.onekids_excel_v3.service;
 import onegroup.onekids_excel_v3.entity.entityv2.Kids;
 import onegroup.onekids_excel_v3.entity.excel.StatusExcel;
 import onegroup.onekids_excel_v3.repository.statusExcel.StatusExcelRepo;
+import onegroup.onekids_excel_v3.service.statusExcel.StatusExcelImpl;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,9 @@ import static onegroup.onekids_excel_v3.common.AppConstant.EXPORT_EXCEL_FAIL;
 public class FileExport {
 
     @Autowired
-    StatusExcelRepo statusExcelRepo;
+    StatusExcelImpl statusExcelImpl;
 
-    private XSSFWorkbook workbook;
+    public XSSFWorkbook workbook;
     private XSSFSheet sheet;
     private List<Kids> listKids;
 
@@ -53,7 +54,7 @@ public class FileExport {
             "Khoản thu 13", "Khoản thu 14", "Khoản thu 15", "Khoản thu 16", "Khoản thu 17", "Khoản thu 18", "Khoản thu 19", "Khoản thu 20",
             "Phải thu tháng này", "Đã thu", "Tiền mặt", "Chuyển khoản", "Thiếu/Thừa còn lại", "Trạng thái", "(1) Ghi chú nhà trường", "(2) Ghi chú trên hóa đơn", "(3) Ghi chú khác"};
 
-    private void writeHeaderLine(int month,int year) {
+    public void writeHeaderLine(int month,int year) {
 
         sheet = workbook.createSheet("Danh sách HS");
 
@@ -129,7 +130,7 @@ public class FileExport {
     }
 
 
-    private void createCell(Row row, int columnCount, Object value, CellStyle style) {
+    public void createCell(Row row, int columnCount, Object value, CellStyle style) {
         // tạo phần cố định
         sheet.createFreezePane(8, 5);
         Font headerFont = workbook.createFont();
@@ -210,7 +211,7 @@ public class FileExport {
 
     }
 
-    private void writeDataLines() {
+    public void writeDataLines() {
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
         headerFont.setColor(IndexedColors.BLACK.getIndex());
@@ -519,27 +520,24 @@ public class FileExport {
         }
     }
 
-    public void export(HttpServletResponse response, StatusExcel statusExcel) throws IOException {
+    public void export(HttpServletResponse response,String guiId,int month,int year) throws IOException {
 
+        StatusExcel statusExcel = statusExcelImpl.findByGuiId(guiId);
         String fileName = statusExcel.getFileName();
-        String pathFile = "C:\\Users\\hungchivang\\Desktop\\OneGroup\\API BackEnd\\MAIN\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\" + fileName ;
-        writeHeaderLine(6,2023);
+        String pathFile = "C:\\Users\\ADMIN\\Desktop\\OneKids\\Code-BackEnd\\Main\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\" + fileName ;
+        writeHeaderLine(month,year);
         writeDataLines();
         try{
             FileOutputStream outputStream = new FileOutputStream(pathFile);
-            try{
-                workbook.write(outputStream);
+            workbook.write(outputStream);
 
-            }catch (IOException ex){
-                ex.printStackTrace();
-            }
             statusExcel.setStatus(EXPORT_EXCEL_COMPLETE);
-            statusExcelRepo.save(statusExcel);
+            statusExcelImpl.save(statusExcel);
             workbook.close();
             outputStream.close();
         }catch(IOException ex) {
             statusExcel.setStatus(EXPORT_EXCEL_FAIL);
-            statusExcelRepo.save(statusExcel);
+            statusExcelImpl.save(statusExcel);
             workbook.close();
             ex.printStackTrace();
         }

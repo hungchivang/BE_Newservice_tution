@@ -14,7 +14,7 @@ public class AttendanceKidsImpl {
     @Autowired
     AttendanceKidsRepo attendanceKidsRepo;
 
-    public List<AttendanceKids> getAttendanceKidsByIdKidsAndMonth1(long idKids){
-        return attendanceKidsRepo.getAttendanceKidsByIdKidsAndMonth1(idKids);
+    public List<AttendanceKids> getAttendanceKidsByIdKidsAndMonth1(long id_kid){
+        return attendanceKidsRepo.getAttendanceKidsByIdKidsAndMonth1(id_kid);
     }
 }

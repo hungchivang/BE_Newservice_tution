@@ -8,8 +8,10 @@ import lombok.Setter;
 import onegroup.onekids_excel_v3.entity.baseexcel.BaseExcel;
 import onegroup.onekids_excel_v3.entity.entityv2.Kids;
 import onegroup.onekids_excel_v3.entity.entityv2.MaUser;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,7 +19,15 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "total_kids_arrive")
-public class TotalKidsArrive extends BaseExcel<String> {
+public class TotalKidsArrive {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @CreatedDate
+    @Column(nullable = false)
+    private LocalDateTime createdDate;
+
     @Column(name = "arrive_t2t6")
     private Long arriveT2t6;
 
@@ -50,9 +60,24 @@ public class TotalKidsArrive extends BaseExcel<String> {
     @JoinColumn(name = "id_kids", nullable = false)
     private Kids kids;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user", nullable = false)
-    private MaUser maUser;
+    public TotalKidsArrive(LocalDateTime createdDate, Long arriveT2t6, Long arriveT7, Long arriveCn, Long absentCpT2t6, Long absentKpT2t6, Long absentCpT7, Long absentKpT7, Long leaveLater, Long month, Kids kids) {
+        this.createdDate = createdDate;
+        this.arriveT2t6 = arriveT2t6;
+        this.arriveT7 = arriveT7;
+        this.arriveCn = arriveCn;
+        this.absentCpT2t6 = absentCpT2t6;
+        this.absentKpT2t6 = absentKpT2t6;
+        this.absentCpT7 = absentCpT7;
+        this.absentKpT7 = absentKpT7;
+        this.leaveLater = leaveLater;
+        this.month = month;
+        this.kids = kids;
+    }
+
+
+    //    @JsonBackReference
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "id_user", nullable = false)
+//    private MaUser maUser;
 
 }

@@ -21,4 +21,8 @@ public class KidExcelService{
     public List<Kids> findAll() {
         return kidsExcelRepo.findAll();
     }
+
+    public List<Kids> test() {
+        return kidsExcelRepo.test();
+    }
 }
