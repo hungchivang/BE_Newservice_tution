@@ -8,8 +8,10 @@ import lombok.Setter;
 import onegroup.onekids_excel_v3.entity.baseexcel.BaseExcel;
 import onegroup.onekids_excel_v3.entity.entityv2.Kids;
 import onegroup.onekids_excel_v3.entity.entityv2.MaUser;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,7 +19,16 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "total_kids_arrive")
-public class TotalKidsArrive extends BaseExcel<String> {
+public class TotalKidsArrive {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @CreatedDate
+    @Column(nullable = false)
+    private LocalDateTime createdDate;
+
     @Column(name = "arrive_t2t6")
     private Long arriveT2t6;
 
@@ -44,6 +55,9 @@ public class TotalKidsArrive extends BaseExcel<String> {
 
     @Column(name = "month")
     private Long month;
+
+    @Column(name = "quantity_date")
+    private Long quantityDate;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)

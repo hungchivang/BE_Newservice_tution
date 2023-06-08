@@ -7,8 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import onegroup.onekids_excel_v3.entity.baseexcel.BaseExcel;
 import onegroup.onekids_excel_v3.entity.entityv2.MaUser;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,7 +19,24 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "history_order_kids")
-public class HistoryOrderKids extends BaseExcel<String> {
+public class HistoryOrderKids  {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @LastModifiedBy
+    private Long idModified;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifieDate;
+
+    @Column(name = "modified_by")
+    private String modifiedBy;
+
+
+    @Column(name = "order_kid_code", length = 45, nullable = false)
+    private String orderKidCode;
+
     @Column(name = "collected_money")
     private Double collectedMoney;
 
