@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "order_kids_excel_t12")
-public class OrderKidsExcelT12 extends BaseExcel<String> {
+public class OrderKidsExcelT12 extends BaseOrder {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "orderKidsExcelT12", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)

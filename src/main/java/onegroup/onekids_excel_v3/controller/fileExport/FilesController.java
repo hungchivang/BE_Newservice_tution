@@ -3,21 +3,17 @@ package onegroup.onekids_excel_v3.controller.fileExport;
 
 import onegroup.onekids_excel_v3.dto.FileInfo;
 import onegroup.onekids_excel_v3.dto.ResponseMessage;
-import onegroup.onekids_excel_v3.entity.entityv2.AttendanceKids;
 import onegroup.onekids_excel_v3.entity.entityv2.Kids;
 import onegroup.onekids_excel_v3.entity.excel.StatusExcel;
 import onegroup.onekids_excel_v3.repository.fileStorage.FilesStorageService;
 import onegroup.onekids_excel_v3.service.FileExport;
-import onegroup.onekids_excel_v3.service.attendance.AttendanceKidsImpl;
-import onegroup.onekids_excel_v3.service.kids.KidExcelService;
+import onegroup.onekids_excel_v3.service.kidsService.KidExcelService;
 import onegroup.onekids_excel_v3.service.statusExcel.StatusExcelImpl;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
@@ -39,7 +35,7 @@ import java.util.stream.Collectors;
 import static onegroup.onekids_excel_v3.common.AppConstant.*;
 
 
-@Controller
+@RestController
 @CrossOrigin("*")
 @RequestMapping("/testExcel")
 public class FilesController {
@@ -51,6 +47,7 @@ public class FilesController {
 
     @Autowired
     StatusExcelImpl statusExcelImpl;
+
 
 
     @PostMapping("/upload")
@@ -165,4 +162,6 @@ public class FilesController {
     public ResponseEntity<List<Kids>> getAllKids(@PathVariable long idSchool) {
         return new ResponseEntity<>(kidExcelService.findAllByIdSchool(idSchool), HttpStatus.OK);
     }
+
+
 }

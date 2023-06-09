@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "order_kids_excel_t07")
-public class OrderKidsExcelT07 extends BaseExcel<String> {
+public class OrderKidsExcelT07 extends BaseOrder {
 
 
     @JsonManagedReference

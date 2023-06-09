@@ -52,6 +52,9 @@ public class TotalKidsArrive {
     @Column(name = "leave_later")
     private Long leaveLater;
 
+    @Column(name = "quantity_date")
+    private Long quantityDate;
+
     @Column(name = "month")
     private Long month;
 
@@ -60,7 +63,7 @@ public class TotalKidsArrive {
     @JoinColumn(name = "id_kids", nullable = false)
     private Kids kids;
 
-    public TotalKidsArrive(LocalDateTime createdDate, Long arriveT2t6, Long arriveT7, Long arriveCn, Long absentCpT2t6, Long absentKpT2t6, Long absentCpT7, Long absentKpT7, Long leaveLater, Long month, Kids kids) {
+    public TotalKidsArrive(LocalDateTime createdDate, Long arriveT2t6, Long arriveT7, Long arriveCn, Long absentCpT2t6, Long absentKpT2t6, Long absentCpT7, Long absentKpT7, Long leaveLater, Long quantityDate, Long month, Kids kids) {
         this.createdDate = createdDate;
         this.arriveT2t6 = arriveT2t6;
         this.arriveT7 = arriveT7;
@@ -70,14 +73,8 @@ public class TotalKidsArrive {
         this.absentCpT7 = absentCpT7;
         this.absentKpT7 = absentKpT7;
         this.leaveLater = leaveLater;
+        this.quantityDate = quantityDate;
         this.month = month;
         this.kids = kids;
     }
-
-
-    //    @JsonBackReference
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "id_user", nullable = false)
-//    private MaUser maUser;
-
 }

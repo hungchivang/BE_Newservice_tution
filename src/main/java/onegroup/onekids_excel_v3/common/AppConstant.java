@@ -226,4 +226,5 @@ public interface AppConstant {
     String EXPORT_EXCEL_FAIL = "fail";
 
     LocalTime TIME_LEAVE_KID_DEFAULT = LocalTime.of(17, 0, 0);
+    long TIME_LEAVE_KID_BLOCK = 10L;
 }

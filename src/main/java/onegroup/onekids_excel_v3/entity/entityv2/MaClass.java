@@ -53,4 +53,7 @@ public class MaClass extends BaseExcel<String> {
     @OneToMany(mappedBy = "maClass", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<AttendanceKids> attendanceKidsList;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "maClass", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    private List<DayOffClass> dayOffClassList;
 }
