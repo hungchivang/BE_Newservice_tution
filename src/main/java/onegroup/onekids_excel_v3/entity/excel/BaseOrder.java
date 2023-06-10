@@ -44,7 +44,6 @@ public abstract class BaseOrder {
     @Column(name = "id_Modified")
     private Long idModified;
 
-
     // 1 là hiện thị ra, 0 là ko hiện thị ra
     @Column(nullable = false, columnDefinition = "bit default 1")
     private boolean delActive = AppConstant.APP_TRUE;
