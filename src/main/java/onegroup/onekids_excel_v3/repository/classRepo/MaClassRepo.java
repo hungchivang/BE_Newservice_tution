@@ -1,12 +1,10 @@
 package onegroup.onekids_excel_v3.repository.classRepo;
 
-import onegroup.onekids_excel_v3.entity.entityv2.DayOffClass;
 import onegroup.onekids_excel_v3.entity.entityv2.MaClass;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 
 public interface MaClassRepo extends JpaRepository<MaClass,Long> {
 

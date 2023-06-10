@@ -1,6 +1,5 @@
 package onegroup.onekids_excel_v3.service.attendance;
 
-import onegroup.onekids_excel_v3.dto.MaClassAndDayOffClass;
 import onegroup.onekids_excel_v3.entity.entityv2.AttendanceKids;
 import onegroup.onekids_excel_v3.entity.entityv2.AttendanceLeaveKids;
 import onegroup.onekids_excel_v3.entity.entityv2.DayOffClass;
@@ -19,9 +18,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static onegroup.onekids_excel_v3.common.AppConstant.TIME_LEAVE_KID_BLOCK;
 import static onegroup.onekids_excel_v3.common.AppConstant.TIME_LEAVE_KID_DEFAULT;
+import static org.apache.commons.collections4.IteratorUtils.forEach;
 
 @Service
 public class TotalKidsArriveImpl {
@@ -44,6 +45,7 @@ public class TotalKidsArriveImpl {
     @Autowired
     MaClassImpl maClassImpl;
 
+
     long arrive_t2t6 = 0L;
     long arrive_t7 = 0L;
     long arrive_cn = 0L;
@@ -54,7 +56,7 @@ public class TotalKidsArriveImpl {
     long leave_later = 0L;
     long quantity_date = 0L;
 
-    @Scheduled(cron = "0 46 18 * * ?")
+    @Scheduled(cron = "0 51 15 * * ?")
     public void cronJobTotalKidsArrive() {
         List<Kids> kidsList = kidExcelService.test();
 
@@ -69,7 +71,7 @@ public class TotalKidsArriveImpl {
             }
 
             if (totalKidsArriveList.size() == 0) {
-                totalKidsArriveRepo.save(new TotalKidsArrive((LocalDateTime.now()), arrive_t2t6, arrive_t7, arrive_cn, absent_cp_t2t6, absent_kp_t2t6, absent_cp_t7, absent_kp_t7, leave_later, quantity_date, (long) ListAttendanceKidsByMonth1OfOnceKid.get(0).getAttendanceDate().getMonth().getValue(), kidsList.get(i)));
+                totalKidsArriveRepo.save(new TotalKidsArrive((LocalDateTime.now()), arrive_t2t6, arrive_t7, arrive_cn, absent_cp_t2t6, absent_kp_t2t6, absent_cp_t7, absent_kp_t7, leave_later,(long) ListAttendanceKidsByMonth1OfOnceKid.size() - quantity_date, (long) ListAttendanceKidsByMonth1OfOnceKid.get(0).getAttendanceDate().getMonth().getValue(), kidsList.get(i)));
                 arrive_t2t6 = 0L;
                 arrive_t7 = 0L;
                 arrive_cn = 0L;
@@ -78,11 +80,12 @@ public class TotalKidsArriveImpl {
                 absent_cp_t7 = 0L;
                 absent_kp_t7 = 0L;
                 leave_later = 0L;
+                quantity_date = 0L;
             } else {
                 for (int j = 0; j < totalKidsArriveList.size(); j++) {
                     if (totalKidsArriveList.get(j).getKids().getId().equals(kidsList.get(i).getId())
                             && totalKidsArriveList.get(j).getMonth() == (long) ListAttendanceKidsByMonth1OfOnceKid.get(0).getAttendanceDate().getMonth().getValue()) {
-                        totalKidsArriveRepo.save(new TotalKidsArrive(totalKidsArriveList.get(j).getId(), (LocalDateTime.now()), arrive_t2t6, arrive_t7, arrive_cn, absent_cp_t2t6, absent_kp_t2t6, absent_cp_t7, absent_kp_t7, leave_later, quantity_date, (long) ListAttendanceKidsByMonth1OfOnceKid.get(0).getAttendanceDate().getMonth().getValue(), kidsList.get(i)));
+                        totalKidsArriveRepo.save(new TotalKidsArrive(totalKidsArriveList.get(j).getId(), (LocalDateTime.now()), arrive_t2t6, arrive_t7, arrive_cn, absent_cp_t2t6, absent_kp_t2t6, absent_cp_t7, absent_kp_t7, leave_later, (long) ListAttendanceKidsByMonth1OfOnceKid.size()- quantity_date, (long) ListAttendanceKidsByMonth1OfOnceKid.get(0).getAttendanceDate().getMonth().getValue(), kidsList.get(i)));
                     }
                 }
                 arrive_t2t6 = 0L;
@@ -93,6 +96,7 @@ public class TotalKidsArriveImpl {
                 absent_cp_t7 = 0L;
                 absent_kp_t7 = 0L;
                 leave_later = 0L;
+                quantity_date = 0L;
             }
         }
     }
@@ -100,12 +104,19 @@ public class TotalKidsArriveImpl {
     public void countQuantityDateAttendanceOfMonth(List<AttendanceKids> ListAttendanceKidsByMonth1OfOnceKid, long idClass) {
         List<DayOffClass> DayOffClassList = dayOffClassImpl.getDayOffClassByIdClass(idClass);
 
-        //không tính ngày nghỉ mặc định
+
         for (int i = 0; i < ListAttendanceKidsByMonth1OfOnceKid.size(); i++) {
             LocalDate date = ListAttendanceKidsByMonth1OfOnceKid.get(i).getAttendanceDate();
-            for (int k = 0; k < DayOffClassList.size(); k++) {
-                if (date == DayOffClassList.get(k).getDate()) {
-                    ListAttendanceKidsByMonth1OfOnceKid.remove(ListAttendanceKidsByMonth1OfOnceKid.get(i));
+            DayOfWeek day = date.getDayOfWeek();
+            int dayOfWeek = day.getValue();
+
+            for (DayOffClass dayOffClass : DayOffClassList) {
+                if (date.equals(dayOffClass.getDate())
+                        || (dayOfWeek == 7 && !maClassImpl.getMaClassByIdClass(idClass).isSunday())
+                        || (dayOfWeek == 6 && !maClassImpl.getMaClassByIdClass(idClass).isMorningSaturday() && !maClassImpl.getMaClassByIdClass(idClass).isAfternoonSaturday() && !maClassImpl.getMaClassByIdClass(idClass).isEveningSaturday())
+                ) {
+                    quantity_date = quantity_date + 1;
+                    break;
                 }
             }
         }
@@ -115,7 +126,6 @@ public class TotalKidsArriveImpl {
             LocalDate date = ListAttendanceKidsByMonth1OfOnceKid.get(j).getAttendanceDate();
             DayOfWeek day = date.getDayOfWeek();
             int dayOfWeek = day.getValue();
-
 
             // bắt dầu tính tổng số ngày đi hoc, nghỉ,đến muộn
             //đi học
@@ -219,6 +229,8 @@ public class TotalKidsArriveImpl {
         }
     }
 
+
+    // đón muộn
     public long kidLeaveLate(AttendanceLeaveKids attendanceLeaveKids) {
         long block = 0L;
         try {
@@ -226,7 +238,7 @@ public class TotalKidsArriveImpl {
             if (timeLeaveKid == null) {
                 return block;
             }
-            long hour = timeLeaveKid.getHour() - 1 - TIME_LEAVE_KID_DEFAULT.getHour();
+            long hour = timeLeaveKid.getHour() - TIME_LEAVE_KID_DEFAULT.getHour();
             long minute = timeLeaveKid.getMinute() - TIME_LEAVE_KID_DEFAULT.getMinute();
 
             if (hour > 0) {
