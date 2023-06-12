@@ -10,6 +10,6 @@ import java.util.List;
 public interface DayOffClassRepo extends JpaRepository<DayOffClass,Long> {
 
 
-    @Query(nativeQuery = true, value = "SELECT * FROM app_onekids_2.day_off_class where id_class=:id_class and date between '2022-01-05' and '2022-02-04'")
-    List<DayOffClass> getDayOffClassByIdClass(@Param("id_class") long id_class);
+    @Query(nativeQuery = true, value = "SELECT * FROM app_onekids_2.day_off_class where id_class=:id_class and date between :startDay and :endDay")
+    List<DayOffClass> getDayOffClassByIdClass(@Param("id_class") long id_class,@Param("startDay") String startDay, @Param("endDay") String endDay);
 }

@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface AttendanceKidsRepo extends JpaRepository<AttendanceKids,Long> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM app_onekids_2.ma_attendance_kids where id_kid =:id_kid and attendance_date between '2022-01-05' and '2022-02-04'")
-    List<AttendanceKids> getAttendanceKidsByIdKidsAndMonth1(@Param("id_kid") long id_kid);
+    @Query(nativeQuery = true, value = "SELECT * FROM app_onekids_2.ma_attendance_kids where id_kid =:id_kid and attendance_date between :startDay and :endDay")
+    List<AttendanceKids> getAttendanceKidsByIdKidsAndMonth1(@Param("id_kid")long id_kid,@Param("startDay") String startDay, @Param("endDay") String endDay);
 }

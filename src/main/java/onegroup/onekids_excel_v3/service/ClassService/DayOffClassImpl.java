@@ -13,7 +13,7 @@ public class DayOffClassImpl {
     @Autowired
     DayOffClassRepo dayOffClassRepo;
 
-    public List<DayOffClass> getDayOffClassByIdClass(long id_class){
-        return dayOffClassRepo.getDayOffClassByIdClass(id_class);
+    public List<DayOffClass> getDayOffClassByIdClass(long id_class,String startDay,String endDay){
+        return dayOffClassRepo.getDayOffClassByIdClass(id_class,startDay,endDay);
     }
 }

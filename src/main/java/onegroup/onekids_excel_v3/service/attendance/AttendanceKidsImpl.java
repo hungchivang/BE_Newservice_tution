@@ -13,7 +13,7 @@ public class AttendanceKidsImpl {
     @Autowired
     AttendanceKidsRepo attendanceKidsRepo;
 
-    public List<AttendanceKids> getAttendanceKidsByIdKidsAndMonth1(long id_kid){
-        return attendanceKidsRepo.getAttendanceKidsByIdKidsAndMonth1(id_kid);
+    public List<AttendanceKids> getAttendanceKidsByIdKidsAndMonth1(long id_kid,String startDay,String endDay){
+        return attendanceKidsRepo.getAttendanceKidsByIdKidsAndMonth1(id_kid,startDay,endDay);
     }
 }
