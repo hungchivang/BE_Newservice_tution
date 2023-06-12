@@ -5,9 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import onegroup.onekids_excel_v3.entity.baseexcel.BaseExcel;
 import onegroup.onekids_excel_v3.entity.entityv2.Kids;
-import onegroup.onekids_excel_v3.entity.entityv2.MaUser;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -20,7 +18,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "total_kids_arrive")
 public class TotalKidsArrive {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -53,20 +50,17 @@ public class TotalKidsArrive {
     @Column(name = "leave_later")
     private Long leaveLater;
 
-    @Column(name = "month")
-    private Long month;
-
     @Column(name = "quantity_date")
     private Long quantityDate;
+
+    @Column(name = "month")
+    private Long month;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_kids", nullable = false)
     private Kids kids;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user", nullable = false)
-    private MaUser maUser;
+
 
 }

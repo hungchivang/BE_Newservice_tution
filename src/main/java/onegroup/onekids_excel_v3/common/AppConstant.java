@@ -219,4 +219,9 @@ public interface AppConstant {
     String KID_SEARCH_START_DATE = "startDate";
     String KID_SEARCH_BIRTHDAY = "birthday";
 
+
+    String RIGHT_CHECK_DATA="true";
+    String WRONG_CHECK_DATA="false";
+
+
 }
