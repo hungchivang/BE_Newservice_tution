@@ -6,7 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IOrderKidsExcelT01Repo extends JpaRepository<OrderKidsExcelT01, Long> {
-
-
-
 }
