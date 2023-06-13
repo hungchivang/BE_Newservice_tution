@@ -18,10 +18,6 @@ public class KidExcelService{
         return kidsExcelRepo.findAllByIdSchool(idSchool);
     }
 
-    public List<Kids> findAll() {
-        return kidsExcelRepo.findAll();
-    }
-
     public List<Kids> test() {
         return kidsExcelRepo.test();
     }

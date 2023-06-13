@@ -153,11 +153,11 @@ public class Kids extends BaseExcel<String> {
     private List<AttendanceKids> attendanceKidsList;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "kids", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "kids", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<TotalKidsArrive> totalKidsArriveList;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "kids", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "kids")
     private List<OrderKidsExcelT01> orderKidsExcelT01List;
 
     @JsonManagedReference

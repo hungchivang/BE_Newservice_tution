@@ -59,7 +59,7 @@ public class TotalKidsArrive {
     private Long month;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_kids", nullable = false)
     private Kids kids;
 

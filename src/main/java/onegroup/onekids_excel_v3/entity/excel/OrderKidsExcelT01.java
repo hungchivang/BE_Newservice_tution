@@ -27,12 +27,12 @@ public class OrderKidsExcelT01 extends BaseOrder {
     private List<HistoryOrderKids> historyOrderKidsList;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_kids", nullable = false)
     private Kids kids;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "id_user", nullable = false)
     private MaUser maUser;
 

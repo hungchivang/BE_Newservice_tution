@@ -5,8 +5,10 @@ import onegroup.onekids_excel_v3.dto.FileInfo;
 import onegroup.onekids_excel_v3.dto.ResponseMessage;
 import onegroup.onekids_excel_v3.entity.entityv2.Kids;
 import onegroup.onekids_excel_v3.entity.excel.StatusExcel;
+import onegroup.onekids_excel_v3.entity.excel.TotalKidsArrive;
 import onegroup.onekids_excel_v3.repository.fileStorage.FilesStorageService;
 import onegroup.onekids_excel_v3.service.FileExport;
+import onegroup.onekids_excel_v3.service.attendance.TotalKidsArriveImpl;
 import onegroup.onekids_excel_v3.service.kidsService.KidExcelService;
 import onegroup.onekids_excel_v3.service.statusExcel.StatusExcelImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,10 @@ public class FilesController {
     @Autowired
     StatusExcelImpl statusExcelImpl;
 
+    @Autowired
+    TotalKidsArriveImpl totalKidsArriveImpl;
+
+
     @PostMapping("/upload")
     public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file) {
         String message = "";
@@ -62,9 +68,9 @@ public class FilesController {
         }
     }
 
-    @GetMapping("/users/export/excel/{idSchool}/{guiId}/{month}/{year}")
+    @GetMapping("/users/export/excel/{guiId}/{month}/{year}")
     @ResponseBody
-    public ResponseEntity<Resource> exportToExcel(HttpServletResponse response, @PathVariable long idSchool, @PathVariable String guiId, @PathVariable int month, @PathVariable int year) throws IOException {
+    public ResponseEntity<Resource> exportToExcel(HttpServletResponse response, @PathVariable String guiId, @PathVariable long month, @PathVariable int year) throws IOException {
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         String currentDateTime = dateFormatter.format(new Date());
 
@@ -76,7 +82,9 @@ public class FilesController {
         Files.move(source, newDir.resolve(source.getFileName()),
                 StandardCopyOption.REPLACE_EXISTING);
 
-        List<Kids> kidsList = kidExcelService.findAllByIdSchool(idSchool);
+        List<Kids> kidsList = kidExcelService.test();
+
+
         FileExport fileExport = new FileExport(kidsList);
 
         StatusExcel statusExcel1 = statusExcelImpl.findByGuiId(guiId);
@@ -89,7 +97,7 @@ public class FilesController {
             String pathFile = "C:\\Users\\ADMIN\\Desktop\\OneKids\\Code-BackEnd\\Main\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\" + fileName;
 
             fileExport.writeHeaderLine(month, year);
-            fileExport.writeDataLines();
+            fileExport.writeDataLines(month);
 
             try {
                 FileOutputStream outputStream = new FileOutputStream(pathFile);
@@ -113,7 +121,7 @@ public class FilesController {
             String pathFile = "C:\\Users\\ADMIN\\Desktop\\OneKids\\Code-BackEnd\\Main\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\" + fileName;
 
             fileExport.writeHeaderLine(month, year);
-            fileExport.writeDataLines();
+            fileExport.writeDataLines(month);
 
             try {
                 FileOutputStream outputStream = new FileOutputStream(pathFile);
@@ -161,5 +169,14 @@ public class FilesController {
         return new ResponseEntity<>(kidExcelService.findAllByIdSchool(idSchool), HttpStatus.OK);
     }
 
+    @GetMapping("/user1/{idSchool}")
+    public ResponseEntity<List<Kids>> getAllKids11(@PathVariable long idSchool) {
+        return new ResponseEntity<>(kidExcelService.findAllByIdSchool(idSchool), HttpStatus.OK);
+    }
+
+    @GetMapping("/user2/{idKids}/{month}")
+    public ResponseEntity<TotalKidsArrive> getAllKids12(@PathVariable long idKids,@PathVariable long month) {
+        return new ResponseEntity<>(totalKidsArriveImpl.getTotalKidsArriveByIdKidAndMonth(idKids,month), HttpStatus.OK);
+    }
 
 }

@@ -13,7 +13,6 @@ public interface KidsExcelRepo extends JpaRepository<Kids,Long> {
 
     List<Kids> findAllByIdSchool(long idSchool);
 
-    List<Kids> findAll();
     @Query(nativeQuery = true, value = "SELECT * FROM app_onekids_2.ma_kids where id_class = 100 and gender = 'Nữ'")
     List<Kids> test();
 }
