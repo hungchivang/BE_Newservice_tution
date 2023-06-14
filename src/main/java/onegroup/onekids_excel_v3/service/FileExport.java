@@ -2,28 +2,29 @@ package onegroup.onekids_excel_v3.service;
 
 import onegroup.onekids_excel_v3.entity.entityv2.Kids;
 import onegroup.onekids_excel_v3.entity.excel.TotalKidsArrive;
-import onegroup.onekids_excel_v3.service.attendance.TotalKidsArriveImpl;
+import org.apache.poi.hssf.usermodel.DVConstraint;
+import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
-@Service
-@Transactional
+import static onegroup.onekids_excel_v3.common.AppConstant.*;
+
+
 public class FileExport {
 
     public XSSFWorkbook workbook;
     private XSSFSheet sheet;
-    private List<Kids> listKids;
+    private final List<Kids> listKids;
 
-    @Autowired
-    TotalKidsArriveImpl totalKidsArriveImpl ;
+    private final List<TotalKidsArrive> totalKidsArriveList;
 
-    public FileExport(List<Kids> listKids) {
+
+    public FileExport(List<Kids> listKids,List<TotalKidsArrive> totalKidsArriveList) {
         this.listKids = listKids;
+        this.totalKidsArriveList = totalKidsArriveList;
         workbook = new XSSFWorkbook();
     }
 
@@ -33,7 +34,7 @@ public class FileExport {
     XSSFColor greenOne = new XSSFColor(new java.awt.Color(120, 243, 136));
     XSSFColor darkSlateGray1 = new XSSFColor(new java.awt.Color(151, 255, 255));
     int[] widths = {10, 15, 30, 15, 17, 15, 25, 15, 15, 15, 15, 20, 24, 20, 20, 15, 25, 25, 15, 15,
-            15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 15, 15, 15, 20, 15, 25, 25, 25};
+            15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 15, 15, 15, 20, 20, 25, 25, 25};
 
     String[] COLUMNs = {"STT", "Mã học sinh", "Họ và tên", "Ngày sinh", "Số điện thoại", "Biệt danh", "Lớp", "Khối", "Học T2-T6", "Học T7", "Học CN", "Nghỉ có phép (T2-T6)",
             "Nghỉ không phép (T2-T6)", "Nghỉ có phép (T7)", "Nghỉ không phép  (T7)", "Đón muộn", "Số ngày theo lịch hàng tháng ", "Thiếu/Thừa tháng trước", "Khoản thu 1",
@@ -41,7 +42,7 @@ public class FileExport {
             "Khoản thu 13", "Khoản thu 14", "Khoản thu 15", "Khoản thu 16", "Khoản thu 17", "Khoản thu 18", "Khoản thu 19", "Khoản thu 20",
             "Phải thu tháng này", "Đã thu", "Tiền mặt", "Chuyển khoản", "Thiếu/Thừa còn lại", "Trạng thái", "(1) Ghi chú nhà trường", "(2) Ghi chú trên hóa đơn", "(3) Ghi chú khác"};
 
-    public void writeHeaderLine(long month, int year) {
+    public void writeHeaderLine(long month) {
 
         sheet = workbook.createSheet("Danh sách HS");
 
@@ -94,7 +95,7 @@ public class FileExport {
                     cell.setCellStyle(threeStyle);
 
                 } else if (col == 1 && i == 2) {
-                    cell.setCellValue(month + "/" + year);
+                    cell.setCellValue(month);
                     CellStyle threeStyle = workbook.createCellStyle();
                     Font cellFont = workbook.createFont();
                     cellFont.setFontHeightInPoints((short) 11);
@@ -140,7 +141,7 @@ public class FileExport {
 
     public void createCell(Row row, int columnCount, Object value, CellStyle style) {
         // tạo phần cố định
-        sheet.createFreezePane(8, 5);
+        sheet.createFreezePane(5, 5);
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
         headerFont.setColor(IndexedColors.BLACK.getIndex());
@@ -287,6 +288,7 @@ public class FileExport {
         contentCellStyle.setBorderLeft(BorderStyle.THIN);
 
         int rowCount = 5;
+
         CreationHelper createHelper = workbook.getCreationHelper();
         short format = createHelper.createDataFormat().getFormat("mm/dd/yyyy");
 
@@ -294,6 +296,20 @@ public class FileExport {
         XSSFFont font = workbook.createFont();
         font.setFontHeight(14);
         style.setFont(font);
+        font.setColor(IndexedColors.BLACK.getIndex());
+        style.setFont(contentFont);
+        style.setWrapText(true);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+
+        //drop list
+        String[] itemsCategory = new String[] { NO_HAVE_BILLS, NO_MONEY_PAYMENT, NO_MONEY_PAYMENT_FULL, YES_MONEY_PAYMENT_FULL, YES_PAYMENT_OVERALL_MONEY };
+        XSSFDataValidationHelper mealdvHelper = new XSSFDataValidationHelper((XSSFSheet) sheet);
+        XSSFDataValidationConstraint mealdvConstraint = (XSSFDataValidationConstraint) mealdvHelper.createExplicitListConstraint(itemsCategory);
 
         // lấy dữ liệu từ DB vào từng ô
         for (int i = 0; i < listKids.size(); i++) {
@@ -315,8 +331,7 @@ public class FileExport {
             Cell cellStt3 = row.createCell(3);
             style.setDataFormat(format);
             cellStt3.setCellValue(listKids.get(i).getBirthDay());
-            cellStt3.setCellStyle(contentCellStyle);
-//            cellStt3.setCellStyle(style);
+            cellStt3.setCellStyle(style);
 
             Cell cellStt4 = row.createCell(4);
             cellStt4.setCellValue(listKids.get(i).getFatherPhone());
@@ -370,29 +385,33 @@ public class FileExport {
             cellStt16.setCellStyle(contentCellStyle);
             cellStt16.setCellStyle(headerMotherCellStyle);
 
-            try {
-                TotalKidsArrive totalKidsArrive = totalKidsArriveImpl.getTotalKidsArriveByIdKidAndMonth(listKids.get(i).getId(),month);
-                    cellStt8.setCellValue(totalKidsArrive.getArriveT2t6());
+            int finalI = i;
+            Optional<TotalKidsArrive> totalKidsArrive = totalKidsArriveList.stream()
+                    .filter(totalKids -> totalKids != null && totalKids.getKids().getId().equals(listKids.get(finalI).getId()) && totalKids.getMonth() == month)
+                    .findFirst();
 
-                    cellStt9.setCellValue(totalKidsArrive.getArriveT7());
+            if (totalKidsArrive.isPresent()) {
+                TotalKidsArrive getTotalKidsArrive = totalKidsArrive.get();
 
-                    cellStt10.setCellValue(totalKidsArrive.getArriveCn());
+                cellStt8.setCellValue(getTotalKidsArrive.getArriveT2t6());
 
-                    cellStt11.setCellValue(totalKidsArrive.getAbsentCpT2t6());
+                cellStt9.setCellValue(getTotalKidsArrive.getArriveT7());
 
-                    cellStt12.setCellValue(totalKidsArrive.getAbsentKpT2t6());
+                cellStt10.setCellValue(getTotalKidsArrive.getArriveCn());
 
-                    cellStt13.setCellValue(totalKidsArrive.getAbsentCpT7());
+                cellStt11.setCellValue(getTotalKidsArrive.getAbsentCpT2t6());
 
-                    cellStt14.setCellValue(totalKidsArrive.getAbsentKpT7());
+                cellStt12.setCellValue(getTotalKidsArrive.getAbsentKpT2t6());
 
-                    cellStt15.setCellValue(totalKidsArrive.getLeaveLater());
+                cellStt13.setCellValue(getTotalKidsArrive.getAbsentCpT7());
 
-                    cellStt16.setCellValue(totalKidsArrive.getQuantityDate());
+                cellStt14.setCellValue(getTotalKidsArrive.getAbsentKpT7());
 
-            } catch(NullPointerException ex){
-                ex.printStackTrace();
+                cellStt15.setCellValue(getTotalKidsArrive.getLeaveLater());
 
+                cellStt16.setCellValue(getTotalKidsArrive.getQuantityDate());
+            } else {
+                // No matching A found
                 cellStt8.setCellValue("");
 
                 cellStt9.setCellValue("");
@@ -412,179 +431,167 @@ public class FileExport {
                 cellStt16.setCellValue("");
             }
 
-                Cell cellStt17 = row.createCell(17);
-                cellStt17.setCellValue("");
-                cellStt17.setCellStyle(contentCellStyle);
-                cellStt17.setCellStyle(headerMoneyCellStyle);
 
-                Cell cellStt18 = row.createCell(18);
-                cellStt18.setCellValue("");
-                cellStt18.setCellStyle(contentCellStyle);
-                cellStt18.setCellStyle(headerStudentCellStyle);
+            Cell cellStt17 = row.createCell(17);
+            cellStt17.setCellValue(0);
+            cellStt17.setCellStyle(contentCellStyle);
+            cellStt17.setCellStyle(headerMoneyCellStyle);
 
-                Cell cellStt19 = row.createCell(19);
-                cellStt19.setCellValue("");
-                cellStt19.setCellStyle(contentCellStyle);
-                cellStt19.setCellStyle(headerStudentCellStyle);
+            Cell cellStt18 = row.createCell(18);
+            cellStt18.setCellValue("");
+            cellStt18.setCellStyle(contentCellStyle);
+            cellStt18.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt20 = row.createCell(20);
-                cellStt20.setCellValue("");
-                cellStt20.setCellStyle(contentCellStyle);
-                cellStt20.setCellStyle(headerStudentCellStyle);
+            Cell cellStt19 = row.createCell(19);
+            cellStt19.setCellValue("");
+            cellStt19.setCellStyle(contentCellStyle);
+            cellStt19.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt21 = row.createCell(21);
-                cellStt21.setCellValue("");
-                cellStt21.setCellStyle(contentCellStyle);
-                cellStt21.setCellStyle(headerStudentCellStyle);
+            Cell cellStt20 = row.createCell(20);
+            cellStt20.setCellValue("");
+            cellStt20.setCellStyle(contentCellStyle);
+            cellStt20.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt22 = row.createCell(22);
-                cellStt22.setCellValue("");
-                cellStt22.setCellStyle(contentCellStyle);
-                cellStt22.setCellStyle(headerStudentCellStyle);
+            Cell cellStt21 = row.createCell(21);
+            cellStt21.setCellValue("");
+            cellStt21.setCellStyle(contentCellStyle);
+            cellStt21.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt23 = row.createCell(23);
-                cellStt23.setCellValue("");
-                cellStt23.setCellStyle(contentCellStyle);
-                cellStt23.setCellStyle(headerStudentCellStyle);
+            Cell cellStt22 = row.createCell(22);
+            cellStt22.setCellValue("");
+            cellStt22.setCellStyle(contentCellStyle);
+            cellStt22.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt24 = row.createCell(24);
-                cellStt24.setCellValue("");
-                cellStt24.setCellStyle(contentCellStyle);
-                cellStt24.setCellStyle(headerStudentCellStyle);
+            Cell cellStt23 = row.createCell(23);
+            cellStt23.setCellValue("");
+            cellStt23.setCellStyle(contentCellStyle);
+            cellStt23.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt25 = row.createCell(25);
-                cellStt25.setCellValue("");
-                cellStt25.setCellStyle(contentCellStyle);
-                cellStt25.setCellStyle(headerStudentCellStyle);
+            Cell cellStt24 = row.createCell(24);
+            cellStt24.setCellValue("");
+            cellStt24.setCellStyle(contentCellStyle);
+            cellStt24.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt26 = row.createCell(26);
-                cellStt26.setCellValue("");
-                cellStt26.setCellStyle(contentCellStyle);
-                cellStt26.setCellStyle(headerStudentCellStyle);
+            Cell cellStt25 = row.createCell(25);
+            cellStt25.setCellValue("");
+            cellStt25.setCellStyle(contentCellStyle);
+            cellStt25.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt27 = row.createCell(27);
-                cellStt27.setCellValue("");
-                cellStt27.setCellStyle(contentCellStyle);
-                cellStt27.setCellStyle(headerStudentCellStyle);
+            Cell cellStt26 = row.createCell(26);
+            cellStt26.setCellValue("");
+            cellStt26.setCellStyle(contentCellStyle);
+            cellStt26.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt28 = row.createCell(28);
-                cellStt28.setCellValue("");
-                cellStt28.setCellStyle(contentCellStyle);
-                cellStt28.setCellStyle(headerStudentCellStyle);
+            Cell cellStt27 = row.createCell(27);
+            cellStt27.setCellValue("");
+            cellStt27.setCellStyle(contentCellStyle);
+            cellStt27.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt29 = row.createCell(29);
-                cellStt29.setCellValue("");
-                cellStt29.setCellStyle(contentCellStyle);
-                cellStt29.setCellStyle(headerStudentCellStyle);
+            Cell cellStt28 = row.createCell(28);
+            cellStt28.setCellValue("");
+            cellStt28.setCellStyle(contentCellStyle);
+            cellStt28.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt30 = row.createCell(30);
-                cellStt30.setCellValue("");
-                cellStt30.setCellStyle(contentCellStyle);
-                cellStt30.setCellStyle(headerStudentCellStyle);
+            Cell cellStt29 = row.createCell(29);
+            cellStt29.setCellValue("");
+            cellStt29.setCellStyle(contentCellStyle);
+            cellStt29.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt31 = row.createCell(31);
-                cellStt31.setCellValue("");
-                cellStt31.setCellStyle(contentCellStyle);
-                cellStt31.setCellStyle(headerStudentCellStyle);
+            Cell cellStt30 = row.createCell(30);
+            cellStt30.setCellValue("");
+            cellStt30.setCellStyle(contentCellStyle);
+            cellStt30.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt32 = row.createCell(32);
-                cellStt32.setCellValue("");
-                cellStt32.setCellStyle(contentCellStyle);
-                cellStt32.setCellStyle(headerStudentCellStyle);
+            Cell cellStt31 = row.createCell(31);
+            cellStt31.setCellValue("");
+            cellStt31.setCellStyle(contentCellStyle);
+            cellStt31.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt33 = row.createCell(33);
-                cellStt33.setCellValue("");
-                cellStt33.setCellStyle(contentCellStyle);
-                cellStt33.setCellStyle(headerStudentCellStyle);
+            Cell cellStt32 = row.createCell(32);
+            cellStt32.setCellValue("");
+            cellStt32.setCellStyle(contentCellStyle);
+            cellStt32.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt34 = row.createCell(34);
-                cellStt34.setCellValue("");
-                cellStt34.setCellStyle(contentCellStyle);
-                cellStt34.setCellStyle(headerStudentCellStyle);
+            Cell cellStt33 = row.createCell(33);
+            cellStt33.setCellValue("");
+            cellStt33.setCellStyle(contentCellStyle);
+            cellStt33.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt35 = row.createCell(35);
-                cellStt35.setCellValue("");
-                cellStt35.setCellStyle(contentCellStyle);
-                cellStt35.setCellStyle(headerStudentCellStyle);
+            Cell cellStt34 = row.createCell(34);
+            cellStt34.setCellValue("");
+            cellStt34.setCellStyle(contentCellStyle);
+            cellStt34.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt36 = row.createCell(36);
-                cellStt36.setCellValue("");
-                cellStt36.setCellStyle(contentCellStyle);
-                cellStt36.setCellStyle(headerStudentCellStyle);
+            Cell cellStt35 = row.createCell(35);
+            cellStt35.setCellValue("");
+            cellStt35.setCellStyle(contentCellStyle);
+            cellStt35.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt37 = row.createCell(37);
-                cellStt37.setCellValue("");
-                cellStt37.setCellStyle(contentCellStyle);
-                cellStt37.setCellStyle(headerStudentCellStyle);
+            Cell cellStt36 = row.createCell(36);
+            cellStt36.setCellValue("");
+            cellStt36.setCellStyle(contentCellStyle);
+            cellStt36.setCellStyle(headerStudentCellStyle);
 
-                Cell cellStt38 = row.createCell(38);
-                cellStt38.setCellValue("");
-                cellStt38.setCellStyle(contentCellStyle);
-                cellStt38.setCellStyle(headerMoneyCellStyle);
+            Cell cellStt37 = row.createCell(37);
+            cellStt37.setCellValue("");
+            cellStt37.setCellStyle(contentCellStyle);
+            cellStt37.setCellStyle(headerStudentCellStyle);
 
-
-                Cell cellStt39 = row.createCell(39);
-                cellStt39.setCellValue("");
-                cellStt39.setCellStyle(contentCellStyle);
-                cellStt39.setCellStyle(headerStudentCellStyle);
-
-                Cell cellStt40 = row.createCell(40);
-                cellStt40.setCellValue("");
-                cellStt40.setCellStyle(contentCellStyle);
-                cellStt40.setCellStyle(headerStudentCellStyle);
-
-                Cell cellStt41 = row.createCell(41);
-                cellStt41.setCellValue("");
-                cellStt41.setCellStyle(contentCellStyle);
-                cellStt41.setCellStyle(headerStudentCellStyle);
+            Cell cellStt38 = row.createCell(38);
+            cellStt38.setCellStyle(contentCellStyle);
+            cellStt38.setCellStyle(headerMoneyCellStyle);
+            cellStt38.setCellFormula("SUM(" + "S" + (i+6) + ":" + "AL" + (i+6) + ")");
 
 
-                Cell cellStt42 = row.createCell(42);
-                cellStt42.setCellValue("");
-                cellStt42.setCellStyle(contentCellStyle);
-                cellStt42.setCellStyle(headerMoneyCellStyle);
+            Cell cellStt39 = row.createCell(39);
+            cellStt39.setCellValue(0);
+            cellStt39.setCellStyle(contentCellStyle);
+            cellStt39.setCellStyle(headerFatherCellStyle);
 
-                Cell cellStt43 = row.createCell(43);
-                cellStt43.setCellValue("");
-                cellStt43.setCellStyle(contentCellStyle);
+            Cell cellStt40 = row.createCell(40);
+            cellStt40.setCellValue("");
+            cellStt40.setCellStyle(contentCellStyle);
+            cellStt40.setCellStyle(headerFatherCellStyle);
+
+            Cell cellStt41 = row.createCell(41);
+            cellStt41.setCellValue("");
+            cellStt41.setCellStyle(contentCellStyle);
+            cellStt41.setCellStyle(headerFatherCellStyle);
 
 
-                Cell cellStt44 = row.createCell(44);
-                cellStt44.setCellValue("");
-                cellStt44.setCellStyle(contentCellStyle);
+            Cell cellStt42 = row.createCell(42);
+            cellStt42.setCellValue("");
+            cellStt42.setCellStyle(contentCellStyle);
+            cellStt42.setCellStyle(headerMoneyCellStyle);
+            cellStt42.setCellFormula("(" + "AN" + (i+6) + "-" + "AM" + (i+6) + ")" + "+" + "R" + (i+6)  );
 
-                Cell cellStt45 = row.createCell(45);
-                cellStt45.setCellValue("");
-                cellStt45.setCellStyle(contentCellStyle);
+            // drop list
+            // CellRangeAddressList(int firstRow, int lastRow, int firstCol, int lastCol)
+            CellRangeAddressList addressListmeal = new CellRangeAddressList(i + 5, i + 5, 43, 43);
+            XSSFDataValidation categoryDataValidation = (XSSFDataValidation) mealdvHelper.createValidation(mealdvConstraint, addressListmeal);
+            categoryDataValidation.setShowErrorBox(true);
+            categoryDataValidation.setSuppressDropDownArrow(true);
+            categoryDataValidation.setShowPromptBox(true);
 
-                Cell cellStt46 = row.createCell(46);
-                cellStt46.setCellValue("");
-                cellStt46.setCellStyle(contentCellStyle);
+            Cell cellStt43 = row.createCell(43);
+            cellStt43.setCellValue("");
+            cellStt43.setCellStyle(contentCellStyle);
+            sheet.addValidationData(categoryDataValidation);
 
+
+            Cell cellStt44 = row.createCell(44);
+            cellStt44.setCellValue("");
+            cellStt44.setCellStyle(contentCellStyle);
+
+            Cell cellStt45 = row.createCell(45);
+            cellStt45.setCellValue("");
+            cellStt45.setCellStyle(contentCellStyle);
+
+            Cell cellStt46 = row.createCell(46);
+            cellStt46.setCellValue("");
+            cellStt46.setCellStyle(contentCellStyle);
         }
     }
 
-//    public void export(HttpServletResponse response, String guiId, long month, int year) throws IOException {
-//
-//        StatusExcel statusExcel = statusExcelImpl.findByGuiId(guiId);
-//        String fileName = statusExcel.getFileName();
-//        String pathFile = "C:\\Users\\ADMIN\\Desktop\\OneKids\\Code-BackEnd\\Main\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\" + fileName;
-//        writeHeaderLine(month, year);
-//        writeDataLines(month);
-//        try {
-//            FileOutputStream outputStream = new FileOutputStream(pathFile);
-//            workbook.write(outputStream);
-//
-//            statusExcel.setStatus(EXPORT_EXCEL_COMPLETE);
-//            statusExcelImpl.save(statusExcel);
-//            workbook.close();
-//            outputStream.close();
-//        } catch (IOException ex) {
-//            statusExcel.setStatus(EXPORT_EXCEL_FAIL);
-//            statusExcelImpl.save(statusExcel);
-//            workbook.close();
-//            ex.printStackTrace();
-//        }
-//    }
 
 }

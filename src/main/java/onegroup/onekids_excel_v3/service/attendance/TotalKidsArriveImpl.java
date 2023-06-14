@@ -7,7 +7,6 @@ import onegroup.onekids_excel_v3.service.ClassService.DayOffClassImpl;
 import onegroup.onekids_excel_v3.service.ClassService.MaClassImpl;
 import onegroup.onekids_excel_v3.service.kidsService.KidExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -65,16 +64,15 @@ public class TotalKidsArriveImpl {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Scheduled(cron = "00 35 15 * * ?")
+    @Scheduled(cron = "00 54 16 * * ?")
     public void truncateTable() {
         entityManager.clear();
         entityManager.createNativeQuery("TRUNCATE TABLE app_onekids_2.total_kids_arrive").executeUpdate();
     }
 
-    @Scheduled(cron = "0 36 15 * * ?")
+    @Scheduled(cron = "0 55 16 * * ?")
     public void saveTotalKidsArrive() {
         List<Kids> kidsList = kidExcelService.test();
-//        List<TotalKidsArrive> totalKidsArriveList = getTotalKidsArrive();
 
         for (int months = 1; months <= 12; months++) {
             for (int i = 0; i < kidsList.size(); i++) {
@@ -112,25 +110,10 @@ public class TotalKidsArriveImpl {
                 absent_kp_t7 = 0L;
                 leave_later = 0L;
 
-//                if (totalKidsArriveList.size() != 0) {
-//                    deleteAllTotalKidsArrive();
-//                    totalKidsArriveRepo.save(new TotalKidsArrive((LocalDateTime.now()), arrive_t2t6, arrive_t7, arrive_cn, absent_cp_t2t6, absent_kp_t2t6, absent_cp_t7, absent_kp_t7, leave_later, (long) ListAttendanceKidsByMonth1OfOnceKid.size(), (long) months, kidsList.get(i)));
-//                    for (TotalKidsArrive totalKidsArrive : totalKidsArriveList) {
-//                        if ((totalKidsArrive.getKids().getId().equals(kidsList.get(i).getId()))
-//                                && (totalKidsArrive.getMonth().equals((long) months))) {
-//                            totalKidsArriveRepo.save(new TotalKidsArrive(totalKidsArrive.getId(), (LocalDateTime.now()), arrive_t2t6, arrive_t7, arrive_cn, absent_cp_t2t6, absent_kp_t2t6, absent_cp_t7, absent_kp_t7, leave_later, (long) ListAttendanceKidsByMonth1OfOnceKid.size(), (long) months, kidsList.get(i)));
-//                        }
-//
-//                    }
-//                } else {
-//                    totalKidsArriveRepo.save(new TotalKidsArrive((LocalDateTime.now()), arrive_t2t6, arrive_t7, arrive_cn, absent_cp_t2t6, absent_kp_t2t6, absent_cp_t7, absent_kp_t7, leave_later, (long) ListAttendanceKidsByMonth1OfOnceKid.size(), (long) months, kidsList.get(i)));
-//                }
 
             }
         }
     }
-
-
 
     public void countQuantityDateAttendanceOfMonth(List<AttendanceKids> ListAttendanceKidsByMonth1OfOnceKid, long idClass) {
 
@@ -241,7 +224,6 @@ public class TotalKidsArriveImpl {
         }
     }
 
-
     // đón muộn
     public long kidLeaveLateOfDay(AttendanceLeaveKids attendanceLeaveKids) {
         long block = 0L;
@@ -271,7 +253,9 @@ public class TotalKidsArriveImpl {
     public void getStartDateAndEndDate(long idSchool, int month) {
         CycleMoney cycleMoney = cycleMoneyImpl.findCycleMoneyByIdSchool(idSchool);
         String typeFees = cycleMoney.getTypeFees();
-        int year = 2022;
+        int year = LocalDate.now().getYear();
+
+        String range_fees = cycleMoney.getRangeFees();
 
         switch (typeFees) {
             case TYPE_DEFAULT: {
@@ -280,35 +264,40 @@ public class TotalKidsArriveImpl {
                 endDate = checkLastDayOfMonth(year, month);
                 break;
             }
-            case RANGE1: {
-                int startDayConfig = cycleMoney.getStartDateFees();
-                int endDayConfig = cycleMoney.getEndDateFees();
-                startDate = year + "-" + month + "-" + startDayConfig;
-                if (startDayConfig == 1 && endDayConfig == 1) {
-                    endDate = checkLastDayOfMonth(year, month);
-                } else if (month == 12 && startDayConfig != 1 && endDayConfig != 1) {
-                    endDate = (year + 1) + "-" + 1 + "-" + (endDayConfig - 1);
-                } else if (month > 0 && month < 12 && startDayConfig != 1 && endDayConfig != 1) {
-                    endDate = year + "-" + (month + 1) + "-" + (endDayConfig - 1);
-                }
-                break;
-            }
-            case RANGE2: {
-                int startDayConfig = cycleMoney.getStartDateFees();
-                int endDayConfig = cycleMoney.getEndDateFees();
+            case TYPE_CUSTOM: {
+                switch (range_fees){
+                    case RANGE1:{
+                        int startDayConfig = cycleMoney.getStartDateFees();
+                        int endDayConfig = cycleMoney.getEndDateFees();
+                        startDate = year + "-" + month + "-" + startDayConfig;
+                        if (startDayConfig == 1 && endDayConfig == 1) {
+                            endDate = checkLastDayOfMonth(year, month);
+                        } else if (month == 12 && startDayConfig != 1 && endDayConfig != 1) {
+                            endDate = (year + 1) + "-" + 1 + "-" + (endDayConfig - 1);
+                        } else if (month > 0 && month < 12 && startDayConfig != 1 && endDayConfig != 1) {
+                            endDate = year + "-" + (month + 1) + "-" + (endDayConfig - 1);
+                        }
+                        break;
+                    }
+                    case RANGE2:{
+                        int startDayConfig = cycleMoney.getStartDateFees();
+                        int endDayConfig = cycleMoney.getEndDateFees();
 
-                if (startDayConfig == 1 && endDayConfig == 1 && month == 1) {
-                    startDate = (year - 1) + "-" + 12 + "-" + startDayConfig;
-                    endDate = checkLastDayOfMonth(year - 1, 12);
-                } else if (month > 1 && month <= 12 && startDayConfig == 1 && endDayConfig == 1) {
-                    startDate = year + "-" + (month - 1) + "-" + startDayConfig;
-                    endDate = checkLastDayOfMonth(year, month - 1);
-                } else if (startDayConfig != 1 && endDayConfig != 1 && month == 1) {
-                    startDate = (year - 1) + "-" + 12 + "-" + startDayConfig;
-                    endDate = year + "-" + month + "-" + (endDayConfig - 1);
-                } else if (startDayConfig != 1 && endDayConfig != 1 && month < 1) {
-                    startDate = year + "-" + (month - 1) + "-" + startDayConfig;
-                    endDate = year + "-" + month + "-" + (endDayConfig - 1);
+                        if (startDayConfig == 1 && endDayConfig == 1 && month == 1) {
+                            startDate = (year - 1) + "-" + 12 + "-" + startDayConfig;
+                            endDate = checkLastDayOfMonth(year - 1, 12);
+                        } else if (month > 1 && month <= 12 && startDayConfig == 1 && endDayConfig == 1) {
+                            startDate = year + "-" + (month - 1) + "-" + startDayConfig;
+                            endDate = checkLastDayOfMonth(year, month - 1);
+                        } else if (startDayConfig != 1 && endDayConfig != 1 && month == 1) {
+                            startDate = (year - 1) + "-" + 12 + "-" + startDayConfig;
+                            endDate = year + "-" + month + "-" + (endDayConfig - 1);
+                        } else if (startDayConfig != 1 && endDayConfig != 1 && month < 1) {
+                            startDate = year + "-" + (month - 1) + "-" + startDayConfig;
+                            endDate = year + "-" + month + "-" + (endDayConfig - 1);
+                        }
+                        break;
+                    }
                 }
                 break;
             }
@@ -340,7 +329,5 @@ public class TotalKidsArriveImpl {
         return totalKidsArriveRepo.findAll();
     }
 
-    public TotalKidsArrive getTotalKidsArriveByIdKidAndMonth(long id_kids,long month) {
-        return totalKidsArriveRepo.getAttendanceLeaveKidsByIdAttendanceKids(id_kids,month);
-    }
+
 }

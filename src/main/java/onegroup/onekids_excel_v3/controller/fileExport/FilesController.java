@@ -68,9 +68,9 @@ public class FilesController {
         }
     }
 
-    @GetMapping("/users/export/excel/{guiId}/{month}/{year}")
+    @GetMapping("/users/export/excel/{guiId}/{month}")
     @ResponseBody
-    public ResponseEntity<Resource> exportToExcel(HttpServletResponse response, @PathVariable String guiId, @PathVariable long month, @PathVariable int year) throws IOException {
+    public ResponseEntity<Resource> exportToExcel(HttpServletResponse response, @PathVariable String guiId, @PathVariable long month) throws IOException {
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         String currentDateTime = dateFormatter.format(new Date());
 
@@ -83,9 +83,9 @@ public class FilesController {
                 StandardCopyOption.REPLACE_EXISTING);
 
         List<Kids> kidsList = kidExcelService.test();
+        List<TotalKidsArrive> totalKidsArriveList = totalKidsArriveImpl.getAllTotalKidsArrive();
 
-
-        FileExport fileExport = new FileExport(kidsList);
+        FileExport fileExport = new FileExport(kidsList,totalKidsArriveList);
 
         StatusExcel statusExcel1 = statusExcelImpl.findByGuiId(guiId);
 
@@ -96,7 +96,7 @@ public class FilesController {
             String fileName = statusExcel2.getFileName();
             String pathFile = "C:\\Users\\ADMIN\\Desktop\\OneKids\\Code-BackEnd\\Main\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\" + fileName;
 
-            fileExport.writeHeaderLine(month, year);
+            fileExport.writeHeaderLine(month);
             fileExport.writeDataLines(month);
 
             try {
@@ -120,7 +120,7 @@ public class FilesController {
             String fileName = statusExcel1.getFileName();
             String pathFile = "C:\\Users\\ADMIN\\Desktop\\OneKids\\Code-BackEnd\\Main\\BE_Newservice_tution\\src\\main\\java\\onegroup\\onekids_excel_v3\\uploadExcel\\" + fileName;
 
-            fileExport.writeHeaderLine(month, year);
+            fileExport.writeHeaderLine(month);
             fileExport.writeDataLines(month);
 
             try {
@@ -174,9 +174,5 @@ public class FilesController {
         return new ResponseEntity<>(kidExcelService.findAllByIdSchool(idSchool), HttpStatus.OK);
     }
 
-    @GetMapping("/user2/{idKids}/{month}")
-    public ResponseEntity<TotalKidsArrive> getAllKids12(@PathVariable long idKids,@PathVariable long month) {
-        return new ResponseEntity<>(totalKidsArriveImpl.getTotalKidsArriveByIdKidAndMonth(idKids,month), HttpStatus.OK);
-    }
 
 }
