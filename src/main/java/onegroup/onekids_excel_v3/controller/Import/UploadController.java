@@ -39,13 +39,10 @@ public class UploadController {
         return uploadService.loadExcelToDataExcel(file);
     }
 
-
     @PostMapping("/saveExcelToDB")
-    public void beforeUpload(@RequestBody SaveExcelParam saveExcelParam)  {
+    public void beforeUpload(@RequestBody SaveExcelParam saveExcelParam) {
         uploadService.saveDataFromExcelToDB(saveExcelParam);
-
     }
-
 
 
 

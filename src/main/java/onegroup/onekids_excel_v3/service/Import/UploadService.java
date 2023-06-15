@@ -467,6 +467,7 @@ public class UploadService {
 
                 switch (month) {
                     case 1:
+
                         OrderKidsExcelT01 orderKidsExcelT01 = orderKidExcelT01Repo.findByKidCode(code);
                         orderKidExcelDTO = modelMapper.map(orderKidsExcelT01, OrderKidExcelDTO.class);
                         totalKidsArrive = totalKidArriveRepo.getTotalKidsArriveByIdKidsAndMonth(kid.getId(), 1);
@@ -566,18 +567,11 @@ public class UploadService {
     }
 
 
-    public void saveDataFromExcelToDB(SaveExcelParam saveExcelParam){
-
-
-
-
+    public void saveDataFromExcelToDB(SaveExcelParam saveExcelParam) {
 
 
 
     }
-
-
-
 
 
 }

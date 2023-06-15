@@ -26,12 +26,11 @@ public abstract class BaseOrder {
     private Long id;
 
     // id người tạo, lấy tự động
-    @Column(nullable = false,name = "id_Created")
+    @Column(nullable = false)
     @CreatedBy
     private Long idCreated;
 
     // tên người tạo, người dùng tự thêm vào
-    @Column(name = "created_By")
     private String createdBy;
 
     // thời gian tạo, lấy tự động
@@ -41,8 +40,21 @@ public abstract class BaseOrder {
 
     // id người sửa. lấy tự động
     @LastModifiedBy
-    @Column(name = "id_Modified")
     private Long idModified;
+
+    // tên người tạo, người code tự thêm nếu muốn
+    private String lastModifiedBy;
+
+    // thời gian sửa, lấy tự động. thời gian sửa sẽ trùng với thời gian tạo trong trường hợp tạo
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
+
+    @Column(name = "collection_turn")
+    private int collectionTurn;
+
+    @Column(name = "description_turn")
+    private String descriptionTurn;
+
 
     // 1 là hiện thị ra, 0 là ko hiện thị ra
     @Column(nullable = false, columnDefinition = "bit default 1")
