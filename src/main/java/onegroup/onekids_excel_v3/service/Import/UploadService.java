@@ -53,30 +53,21 @@ public class UploadService {
     @Autowired
     ModelMapper modelMapper;
 
-
     List<DataExcel> dataExcels = new ArrayList<>();
 
     int month = 0;
 
-    public List<ResponseBeforeUpload> loadExcelToDataExcel(MultipartFile file) throws IOException {
+    public List<ResponseBeforeUpload> loadExcelToDataExcel(MultipartFile file, int collectionTurn, String descriptionTurn) throws IOException {
 
         dataExcels.clear();
 
         try (InputStream inputStream = file.getInputStream()) {
             Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet sheet = workbook.getSheetAt(0);
-
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-
-
                 DataExcel dataExcel = new DataExcel();
-
-
                 Row row = sheet.getRow(i);
-
                 int rowNum = row.getRowNum();
-
-
                 if (rowNum == 0 && rowNum == 3) {
                     continue;
                 }
@@ -295,6 +286,14 @@ public class UploadService {
                     String noteExcel1 = row.getCell(44).getStringCellValue();
                     String noteExcel2 = row.getCell(45).getStringCellValue();
                     String noteExcel3 = row.getCell(46).getStringCellValue();
+//                    int collection = (int) row.getCell(47).getNumericCellValue();
+
+
+                    if (row.getCell(48).getCellType() == CellType.BLANK) {
+                        row.getCell(48).setCellValue(descriptionTurn);
+                    }
+                    String description = row.getCell(48).getStringCellValue();
+
 
                     dataExcel.setKidCode(kidCode);
                     dataExcel.setNameKid(name);
@@ -342,6 +341,8 @@ public class UploadService {
                     dataExcel.setNoteExcel1(noteExcel1);
                     dataExcel.setNoteExcel2(noteExcel2);
                     dataExcel.setNoteExcel3(noteExcel3);
+                    dataExcel.setCollectionTurn(collectionTurn);
+                    dataExcel.setDescriptionTurn(description);
 
                     dataExcels.add(dataExcel);
                 }
@@ -380,6 +381,9 @@ public class UploadService {
             String nickName = data.getNickName();
             String nameClass = data.getNameClass();
             String nameGrade = data.getNameGrade();
+
+//            Lượt thu
+            int collectionTurn = data.getCollectionTurn();
 
             //           Điểm danh
             Long arriveT2t6 = data.getArriveT2t6();
@@ -467,37 +471,19 @@ public class UploadService {
 
                 switch (month) {
                     case 1:
-
-                        OrderKidsExcelT01 orderKidsExcelT01 = orderKidExcelT01Repo.findByKidCode(code);
+                        OrderKidsExcelT01 orderKidsExcelT01 = orderKidExcelT01Repo.findByKidCodeAndCollectionTurn(code, collectionTurn);
                         orderKidExcelDTO = modelMapper.map(orderKidsExcelT01, OrderKidExcelDTO.class);
                         totalKidsArrive = totalKidArriveRepo.getTotalKidsArriveByIdKidsAndMonth(kid.getId(), 1);
-
                         break;
                     case 2:
-                        OrderKidsExcelT02 orderKidsExcelT02 = orderKidExcelT02Repo.findByKidCode(code);
+                        OrderKidsExcelT02 orderKidsExcelT02 = orderKidExcelT02Repo.findByKidCodeAndCollectionTurn(code, collectionTurn);
                         orderKidExcelDTO = modelMapper.map(orderKidsExcelT02, OrderKidExcelDTO.class);
                         totalKidsArrive = totalKidArriveRepo.getTotalKidsArriveByIdKidsAndMonth(kid.getId(), 2);
-
                         break;
                     default:
 
                 }
 
-                if (
-                        arriveT2t6.equals(totalKidsArrive.getArriveT2t6())
-                                && arriveT7.equals(totalKidsArrive.getArriveT7())
-                                && arriveCn.equals(totalKidsArrive.getArriveCn())
-                                && absentCpT2t6.equals(totalKidsArrive.getAbsentCpT2t6())
-                                && absentKpT2t6.equals(totalKidsArrive.getAbsentKpT2t6())
-                                && absentCpT7.equals(totalKidsArrive.getAbsentCpT7())
-                                && absentKpT7.equals(totalKidsArrive.getAbsentKpT7())
-                                && leaveLater.equals(totalKidsArrive.getLeaveLater())
-                                && quantityDate.equals(totalKidsArrive.getQuantityDate())
-                ) {
-                    response.setNotifyAttendance(AppConstant.RIGHT_CHECK_DATA);
-                } else {
-                    response.setNotifyAttendance(AppConstant.WRONG_CHECK_DATA);
-                }
 
                 if (orderKidExcelDTO != null) {
 
@@ -550,7 +536,27 @@ public class UploadService {
                         response.setNotifyMoney(AppConstant.WRONG_CHECK_DATA);
                     }
 
+
+                    if (
+                            arriveT2t6.equals(orderKidExcelDTO.getArriveT2t6())
+                                    && arriveT7.equals(orderKidExcelDTO.getArriveT7())
+                                    && arriveCn.equals(orderKidExcelDTO.getArriveCn())
+                                    && absentCpT2t6.equals(orderKidExcelDTO.getAbsentCpT2t6())
+                                    && absentKpT2t6.equals(orderKidExcelDTO.getAbsentKpT2t6())
+                                    && absentCpT7.equals(orderKidExcelDTO.getAbsentCpT7())
+                                    && absentKpT7.equals(orderKidExcelDTO.getAbsentKpT7())
+                                    && leaveLater.equals(orderKidExcelDTO.getLeaveLater())
+                                    && quantityDate.equals(orderKidExcelDTO.getQuantityDate())
+                    ) {
+                        response.setNotifyAttendance(AppConstant.RIGHT_CHECK_DATA);
+                    } else {
+                        response.setNotifyAttendance(AppConstant.WRONG_CHECK_DATA);
+                    }
+
+
                 } else {
+
+                    response.setNotifyAttendance(AppConstant.RIGHT_CHECK_DATA);
                     response.setNotifyMoney(AppConstant.RIGHT_CHECK_DATA);
                 }
 
@@ -560,7 +566,6 @@ public class UploadService {
 
         }
 
-
         System.out.println(responses.size());
         System.out.println(responses);
         return responses;
@@ -568,7 +573,43 @@ public class UploadService {
 
 
     public void saveDataFromExcelToDB(SaveExcelParam saveExcelParam) {
+        String kidCode = saveExcelParam.getKidCode();
+        int month = saveExcelParam.getMonth();
+        boolean statusSaveAttendance = saveExcelParam.isStatusSaveAttendance();
+        boolean statusSaveMoney = saveExcelParam.isStatusSaveMoney();
 
+
+        for (int i = 0; i < dataExcels.size(); i++) {
+
+            int collectionTurn = dataExcels.get(i).getCollectionTurn();
+
+
+            switch (month) {
+                case 1:
+                    OrderKidsExcelT01 orderKidsExcelT01 = orderKidExcelT01Repo.findByKidCodeAndCollectionTurn(kidCode, collectionTurn);
+                    if (orderKidsExcelT01 == null) {
+                        orderKidExcelT01Repo.save(orderKidsExcelT01);
+                    } else {
+
+
+
+
+                    }
+
+
+                    break;
+                case 2:
+
+                    break;
+                default:
+
+            }
+
+
+            DataExcel data = dataExcels.get(i);
+
+
+        }
 
 
     }

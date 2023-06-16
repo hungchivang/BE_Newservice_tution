@@ -2,6 +2,7 @@ package onegroup.onekids_excel_v3.dto.Import;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import onegroup.onekids_excel_v3.common.AppConstant;
 
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class DataExcel {
 
     private Long id;
@@ -17,8 +19,6 @@ public class DataExcel {
     // 1 là hiện thị ra, 0 là ko hiện thị ra
 
     private boolean delActive = AppConstant.APP_TRUE;
-
-
     private Boolean orderHidden;
 
     private String nameSchool;
@@ -46,6 +46,10 @@ public class DataExcel {
 
 
     private String category;
+
+
+    private int collectionTurn;
+    private String descriptionTurn;
 
 
     private Long arriveT2t6;
@@ -231,8 +235,7 @@ public class DataExcel {
 
     private String noteExcel3;
 
-    public DataExcel() {
-    }
+
 
 
 

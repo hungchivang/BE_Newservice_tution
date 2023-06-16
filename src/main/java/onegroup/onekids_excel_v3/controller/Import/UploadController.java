@@ -35,17 +35,14 @@ public class UploadController {
     UploadService uploadService;
 
     @PostMapping("/uploadExcel")
-    public List<ResponseBeforeUpload> beforeUpload(@RequestParam("file") MultipartFile file) throws IOException {
-        return uploadService.loadExcelToDataExcel(file);
+    public List<ResponseBeforeUpload> beforeUpload(@RequestParam("file") MultipartFile file, @RequestParam("collectionTurn") int collectionTurn) throws IOException {
+        return uploadService.loadExcelToDataExcel(file, collectionTurn);
     }
 
     @PostMapping("/saveExcelToDB")
     public void beforeUpload(@RequestBody SaveExcelParam saveExcelParam) {
         uploadService.saveDataFromExcelToDB(saveExcelParam);
     }
-
-
-
 
 
 }

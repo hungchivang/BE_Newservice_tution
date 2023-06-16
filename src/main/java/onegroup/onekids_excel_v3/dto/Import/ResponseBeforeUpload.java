@@ -2,6 +2,8 @@ package onegroup.onekids_excel_v3.dto.Import;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ResponseBeforeUpload {
 
@@ -12,6 +14,8 @@ public class ResponseBeforeUpload {
     private String kidCode;
     private String name;
     private String nameClass;
+
+//    private List<Integer> collectionTurn;
 
     public ResponseBeforeUpload() {
     }

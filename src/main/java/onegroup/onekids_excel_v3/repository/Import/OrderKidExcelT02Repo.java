@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 public interface OrderKidExcelT02Repo extends JpaRepository<OrderKidsExcelT02,Long>{
 
-    OrderKidsExcelT02 findByKidCode(String kidCode);
+    OrderKidsExcelT02 findByKidCodeAndCollectionTurn(String kidCode,int collectionTurn );
 
 
 }
