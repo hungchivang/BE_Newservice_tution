@@ -13,6 +13,7 @@ public class SaveExcelParam {
     private int month;
     private boolean statusSaveAttendance;
     private boolean statusSaveMoney;
+    private Long idUser;
 
 
 
