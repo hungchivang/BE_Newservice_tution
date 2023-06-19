@@ -324,8 +324,6 @@ public class UploadService {
                     String noteExcel1 = row.getCell(44).getStringCellValue();
                     String noteExcel2 = row.getCell(45).getStringCellValue();
                     String noteExcel3 = row.getCell(46).getStringCellValue();
-//                    int collection = (int) row.getCell(47).getNumericCellValue();
-
 
                     if (row.getCell(47).getCellType() == CellType.BLANK) {
                         row.getCell(47).setCellValue(descriptionTurn);
@@ -485,6 +483,10 @@ public class UploadService {
 
             if (kid == null) {
                 response.setNotifyKidCode(AppConstant.WRONG_CHECK_DATA);
+                response.setNotifyAttendance(AppConstant.WRONG_CHECK_DATA);
+                response.setNotifyInfo(AppConstant.WRONG_CHECK_DATA);
+                response.setNotifyMoney(AppConstant.WRONG_CHECK_DATA);
+
             }
             if (kid != null) {
                 response.setNotifyKidCode(AppConstant.RIGHT_CHECK_DATA);
@@ -609,123 +611,41 @@ public class UploadService {
     }
 
 
-    public void saveDataFromExcelToDB(SaveExcelParam saveExcelParam) {
-        String kidCode = saveExcelParam.getKidCode();
-        int month = saveExcelParam.getMonth();
-        boolean statusSaveAttendance = saveExcelParam.isStatusSaveAttendance();
-        boolean statusSaveMoney = saveExcelParam.isStatusSaveMoney();
-        Long idUser = saveExcelParam.getIdUser();
-        DataExcel data = new DataExcel();
-        for (int i = 0; i < dataExcels.size(); i++) {
-            if (dataExcels.get(i).getKidCode().equals(kidCode)) {
-                data = dataExcels.get(i);
-            }
-        }
-        int collectionTurn = data.getCollectionTurn();
-        switch (month) {
+    public void saveDataFromExcelToDB(List<SaveExcelParam> saveExcelParams) {
 
-            case 1:
+        for (SaveExcelParam saveExcelParam : saveExcelParams) {
+            String kidCode = saveExcelParam.getKidCode();
+            int month = saveExcelParam.getMonth();
+            boolean statusSaveAttendance = saveExcelParam.isStatusSaveAttendance();
+            boolean statusSaveMoney = saveExcelParam.isStatusSaveMoney();
+            Long idUser = saveExcelParam.getIdUser();
+
+            DataExcel data = new DataExcel();
+
+            for (int i = 0; i < dataExcels.size(); i++) {
+                if (dataExcels.get(i).getKidCode().equals(kidCode)) {
+                    data = dataExcels.get(i);
+                }
+            }
+            int collectionTurn = data.getCollectionTurn();
+            switch (month) {
+
+                case 1:
 
                 saveExcelToDBT01(kidCode, collectionTurn, statusSaveAttendance, statusSaveMoney, data, idUser);
-//                OrderKidsExcelT01 orderKidsExcelT01 = orderKidExcelT01Repo.findByKidCodeAndCollectionTurn(kidCode, collectionTurn);
-//
-//                System.out.println(orderKidsExcelT01);
-//
-//                if (orderKidsExcelT01 == null) {
-//                    orderKidsExcelT01 = modelMapper.map(data, OrderKidsExcelT01.class);
-//                    orderKidsExcelT01.setIdCreated(idUser);
-//                    orderKidsExcelT01.setIdModified(null);
-//                    orderKidsExcelT01.setCreatedDate(LocalDateTime.now());
-//                    orderKidsExcelT01.setMaUser(maUserRepo.findById(idUser).get());
-//                    orderKidsExcelT01.setKids(kidsRepo.findKidByKidCode(data.getKidCode()));
-//                    orderKidsExcelT01.setOrderKidCode(data.getKidCode() + "T01");
-//                    orderKidExcelT01Repo.save(orderKidsExcelT01);
-//                    System.out.println(orderKidsExcelT01);
-//
-//
-//                } else {
-//
-//                    orderKidsExcelT01.setIdModified(idUser);
-//                    orderKidsExcelT01.setLastModifiedDate(LocalDateTime.now());
-////                        Có ghi đè điểm danh
-//                    if (statusSaveAttendance) {
-//
-//                        orderKidsExcelT01.setArriveT2t6(data.getArriveT2t6());
-//                        orderKidsExcelT01.setArriveT7(data.getArriveT7());
-//                        orderKidsExcelT01.setArriveCn(data.getArriveCn());
-//                        orderKidsExcelT01.setAbsentCpT2t6(data.getAbsentCpT2t6());
-//                        orderKidsExcelT01.setAbsentKpT2t6(data.getAbsentKpT2t6());
-//                        orderKidsExcelT01.setAbsentCpT7(data.getAbsentCpT7());
-//                        orderKidsExcelT01.setAbsentKpT7(data.getAbsentKpT7());
-//                        orderKidsExcelT01.setLeaveLater(data.getLeaveLater());
-//                        orderKidsExcelT01.setQuantityDate(data.getQuantityDate());
-//
-//                    }
-////                        Có ghi đè khoản thu
-//
-//                    if (statusSaveMoney) {
-//
-//                        orderKidsExcelT01.setNameKt1(data.getNameKt1());
-//                        orderKidsExcelT01.setNameKt2(data.getNameKt2());
-//                        orderKidsExcelT01.setNameKt3(data.getNameKt3());
-//                        orderKidsExcelT01.setNameKt4(data.getNameKt4());
-//                        orderKidsExcelT01.setNameKt5(data.getNameKt5());
-//                        orderKidsExcelT01.setNameKt6(data.getNameKt6());
-//                        orderKidsExcelT01.setNameKt7(data.getNameKt7());
-//                        orderKidsExcelT01.setNameKt8(data.getNameKt8());
-//                        orderKidsExcelT01.setNameKt9(data.getNameKt9());
-//                        orderKidsExcelT01.setNameKt10(data.getNameKt10());
-//                        orderKidsExcelT01.setNameKt11(data.getNameKt11());
-//                        orderKidsExcelT01.setNameKt12(data.getNameKt12());
-//                        orderKidsExcelT01.setNameKt13(data.getNameKt13());
-//                        orderKidsExcelT01.setNameKt14(data.getNameKt14());
-//                        orderKidsExcelT01.setNameKt15(data.getNameKt15());
-//                        orderKidsExcelT01.setNameKt16(data.getNameKt16());
-//                        orderKidsExcelT01.setNameKt17(data.getNameKt17());
-//                        orderKidsExcelT01.setNameKt18(data.getNameKt18());
-//                        orderKidsExcelT01.setNameKt19(data.getNameKt19());
-//                        orderKidsExcelT01.setNameKt20(data.getNameKt20());
-//
-//
-//                        orderKidsExcelT01.setMoneyKt1(data.getMoneyKt1());
-//                        orderKidsExcelT01.setMoneyKt2(data.getMoneyKt2());
-//                        orderKidsExcelT01.setMoneyKt3(data.getMoneyKt3());
-//                        orderKidsExcelT01.setMoneyKt4(data.getMoneyKt4());
-//                        orderKidsExcelT01.setMoneyKt5(data.getMoneyKt5());
-//                        orderKidsExcelT01.setMoneyKt6(data.getMoneyKt6());
-//                        orderKidsExcelT01.setMoneyKt7(data.getMoneyKt7());
-//                        orderKidsExcelT01.setMoneyKt8(data.getMoneyKt8());
-//                        orderKidsExcelT01.setMoneyKt9(data.getMoneyKt9());
-//                        orderKidsExcelT01.setMoneyKt10(data.getMoneyKt10());
-//                        orderKidsExcelT01.setMoneyKt11(data.getMoneyKt11());
-//                        orderKidsExcelT01.setMoneyKt12(data.getMoneyKt12());
-//                        orderKidsExcelT01.setMoneyKt13(data.getMoneyKt13());
-//                        orderKidsExcelT01.setMoneyKt14(data.getMoneyKt14());
-//                        orderKidsExcelT01.setMoneyKt15(data.getMoneyKt15());
-//                        orderKidsExcelT01.setMoneyKt16(data.getMoneyKt16());
-//                        orderKidsExcelT01.setMoneyKt17(data.getMoneyKt17());
-//                        orderKidsExcelT01.setMoneyKt18(data.getMoneyKt18());
-//                        orderKidsExcelT01.setMoneyKt19(data.getMoneyKt19());
-//                        orderKidsExcelT01.setMoneyKt20(data.getMoneyKt20());
-//
-//                    }
-//
-//                    orderKidExcelT01Repo.save(orderKidsExcelT01);
-//                    System.out.println(orderKidsExcelT01);
-//
-//                }
-
-                break;
-            case 2:
 
 
-                break;
-            default:
+                    break;
+                case 2:
+
+
+                    break;
+                default:
+
+            }
+
 
         }
-
-
-//        }
         System.out.println("Đây là Data_Excels");
         System.out.println(dataExcels);
 
@@ -824,7 +744,6 @@ public class UploadService {
 
         }
     }
-
 
 }
 

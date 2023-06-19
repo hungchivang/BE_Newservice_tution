@@ -41,8 +41,8 @@ public class UploadController {
 
 
     @PostMapping("/saveExcelToDB")
-    public void beforeUpload(@RequestBody SaveExcelParam saveExcelParam) {
-        uploadService.saveDataFromExcelToDB(saveExcelParam);
+    public void beforeUpload(@RequestBody List<SaveExcelParam> saveExcelParams) {
+        uploadService.saveDataFromExcelToDB(saveExcelParams);
     }
 
 
